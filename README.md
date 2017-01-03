@@ -7,7 +7,7 @@ This is the official Veritrans extension for the OpenCart E-commerce platform.
 
 ## Compatibility
 1. PHP v5.4 and higher
-2. Opencart v2.0, 2.1, 2.2
+2. Opencart v2.3
 
 ## Installation
 
