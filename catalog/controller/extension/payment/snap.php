@@ -447,6 +447,7 @@ class ControllerExtensionPaymentSnap extends Controller {
       $this->response->setOutput($this->load->view('default/template/payment/snap_checkout_failure.tpl', $data));
     }
   }
+
  // Response early with 200 OK status for Midtrans notification & handle HTTP GET
   public function earlyResponse(){
     if ( $_SERVER['REQUEST_METHOD'] == 'GET' ){
@@ -474,7 +475,7 @@ class ControllerExtensionPaymentSnap extends Controller {
    * status sent by snap server.
    */
   public function payment_notification() {
-    error_log('tes');
+    
     //http://your_website/index.php?route=extension/payment/snap/payment_notification
 
     Veritrans_Config::$serverKey = $this->config->get('snap_server_key');
@@ -486,7 +487,7 @@ class ControllerExtensionPaymentSnap extends Controller {
     $this->load->model('extension/payment/snap');
     $notif = new Veritrans_Notification();
     
-    error_log(print_r($notif,TRUE));
+    //error_log(print_r($notif,TRUE));
 
     $transaction = $notif->transaction_status;
     $fraud = $notif->fraud_status;
