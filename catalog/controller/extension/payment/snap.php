@@ -27,11 +27,11 @@ class ControllerExtensionPaymentSnap extends Controller {
     $data['errors'] = array();
     $data['button_confirm'] = $this->language->get('button_confirm');
 
-  	$data['pay_type'] = 'snap';
+    $data['pay_type'] = 'snap';
     $data['environment'] = $this->config->get('snap_environment');
     $data['text_loading'] = $this->language->get('text_loading');
 
-  	$data['process_order'] = $this->url->link('extension/payment/snap/process_order');
+    $data['process_order'] = $this->url->link('extension/payment/snap/process_order');
 
      if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/snap.tpl')) {
         return $this->load->view($this->config->get('config_template') . '/template/payment/snap.tpl',$data);
@@ -62,7 +62,6 @@ class ControllerExtensionPaymentSnap extends Controller {
     $order_info = $this->model_checkout_order->getOrder(
       $this->session->data['order_id']);
     //error_log(print_r($order_info,TRUE));
-    error_log($this->config->get('snap_snap_challenge_mapping'));
 
     $this->model_checkout_order->addOrderHistory($this->session->data['order_id'],1);
     /*$this->model_checkout_order->addOrderHistory($this->session->data['order_id'],
@@ -243,7 +242,6 @@ class ControllerExtensionPaymentSnap extends Controller {
 
     $this->load->model('checkout/order');
     $redirUrl = $this->config->get('config_ssl');
-
     //$this->cart->clear();
 
     Veritrans_Config::$serverKey = $this->config->get('snap_server_key');
@@ -257,6 +255,7 @@ class ControllerExtensionPaymentSnap extends Controller {
     
     $response = isset($_POST['result_data']) ? json_decode($_POST['result_data']) : json_decode($_POST['response']);
     //error_log($response->va_numbers[0]->bank);
+    //error_log(print_r($response,TRUE));
     $base_url = $this->config->get('snap_environment') == 'production' 
     ? "https://app.veritrans.co.id" : "https://app.sandbox.veritrans.co.id";
     
@@ -275,21 +274,18 @@ class ControllerExtensionPaymentSnap extends Controller {
 
     }else if( $transaction_status == 'deny') {
       //if deny, redirect to order checkout page again
-      error_log('masuk ke deny case');
-      $redirUrl = $this->url->link('payment/snap/failure','','SSL');
+      $redirUrl = $this->url->link('extension/payment/snap/failure');
       $this->response->redirect($redirUrl);
 
     }else if( $transaction_status == 'pending' && in_array($payment_type, $channel)){
 
       $check = Veritrans_Transaction::status($response->transaction_id);
-          error_log(print_r($check,TRUE));
+          //error_log(print_r($check,TRUE));
 
       $this->model_checkout_order->addOrderHistory($response->order_id,1);
       $this->cart->clear();
       $xl_tunai_instruction = "
       xl tunai payment instruction </br>
-      XL Tunai </br>
-      Instruction </br>
       1.  Dial *123*120# </br>
       2.  Reply '4' for 'Belanja Online' </br>
       3.  Input XL Tunai Merchant Code </br>
@@ -396,27 +392,20 @@ class ControllerExtensionPaymentSnap extends Controller {
             break;
         }
 
-
       $this->document->setTitle('Payment has not complete yet!'); //Optional. Set the title of your web page.
            
-   /*   // We call this Fallback system
-      if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/snap_exec.tpl')) { //if  file exists in your current template folder
-          $this->template = $this->config->get('config_template') . '/template/payment/snap_exec.tpl'; //get it
-      } else {
-          $this->template = 'default/template/payment/snap_exec.tpl'; //or get the file from the default folder
-      }
-   */
       $data['column_left'] = $this->load->controller('common/column_left');
       $data['column_right'] = $this->load->controller('common/column_right');
       $data['content_top'] = $this->load->controller('common/content_top');
       $data['content_bottom'] = $this->load->controller('common/content_bottom');
       $data['footer'] = $this->load->controller('common/footer');
       $data['header'] = $this->load->controller('common/header');
-      $this->response->setOutput($this->load->view('default/template/payment/snap_exec.tpl',$data));
+  
+      $this->response->setOutput($this->load->view('extension/payment/snap_exec',$data));
 
     }
     else{
-      $redirUrl = $this->url->link('payment/snap/failure','','SSL');
+      $redirUrl = $this->url->link('extension/payment/snap/failure');
       $this->response->redirect($redirUrl); 
     }
     
@@ -426,8 +415,8 @@ class ControllerExtensionPaymentSnap extends Controller {
   * redirect to payment failure using template & language (text template)
   */
   public function failure() {
-    $this->load->language('payment/snap');
 
+    $this->load->language('extension/payment/snap');
     $this->document->setTitle($this->language->get('heading_title'));
 
     $data['heading_title'] = $this->language->get('heading_title');
@@ -441,14 +430,16 @@ class ControllerExtensionPaymentSnap extends Controller {
     $data['header'] = $this->load->controller('common/header');
     $data['checkout_url'] = $this->url->link('checkout/cart');
 
-    if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/snap_checkout_failure.tpl')) {
-      $this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/payment/snap_checkout_failure.tpl', $data));
-    } else {
-      $this->response->setOutput($this->load->view('default/template/payment/snap_checkout_failure.tpl', $data));
-    }
+    $this->response->setOutput($this->load->view('extension/payment/snap_checkout_failure',$data));
   }
 
- // Response early with 200 OK status for Midtrans notification & handle HTTP GET
+  /**
+   * Called when snap server sends notification to this server.
+   * It will change order status according to transaction status and fraud
+   * status sent by snap server.
+   */
+
+  // Response early with 200 OK status for Midtrans notification & handle HTTP GET
   public function earlyResponse(){
     if ( $_SERVER['REQUEST_METHOD'] == 'GET' ){
       die('This endpoint should not be opened using browser (HTTP GET). This endpoint is for Midtrans notification URL (HTTP POST)');
@@ -469,26 +460,16 @@ class ControllerExtensionPaymentSnap extends Controller {
     flush();
   }
 
-  /**
-   * Called when snap server sends notification to this server.
-   * It will change order status according to transaction status and fraud
-   * status sent by snap server.
-   */
   public function payment_notification() {
-    
     //http://your_website/index.php?route=extension/payment/snap/payment_notification
 
     Veritrans_Config::$serverKey = $this->config->get('snap_server_key');
     Veritrans_Config::$isProduction = $this->config->get('snap_environment') == 'production' ? true : false;
-
     $this->earlyResponse();
-
     $this->load->model('checkout/order');
     $this->load->model('extension/payment/snap');
     $notif = new Veritrans_Notification();
-    
     //error_log(print_r($notif,TRUE));
-
     $transaction = $notif->transaction_status;
     $fraud = $notif->fraud_status;
     $payment_type = $notif->payment_type;
@@ -520,7 +501,7 @@ class ControllerExtensionPaymentSnap extends Controller {
       $this->model_checkout_order->addOrderHistory(
           $notif->order_id,8,'Update Deny from snap notif.');
     }
-	  else if ($transaction == 'pending') {
+    else if ($transaction == 'pending') {
       $logs .= 'pending ';
       $this->model_checkout_order->addOrderHistory(
           $notif->order_id,1,'update pending from snap notif.');
