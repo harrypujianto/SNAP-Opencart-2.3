@@ -200,8 +200,8 @@ class ControllerExtensionPaymentSnap extends Controller {
       $item_details[] = $coupon_item;
     }
 
-    Veritrans_Config::$serverKey = $this->config->
-        get('snap_server_key');
+    $serverKey = $this->config->get('snap_server_key');
+    Veritrans_Config::$serverKey = $serverKey;
 
     Veritrans_Config::$isProduction =
         $this->config->get('snap_environment') == 'production'
@@ -209,19 +209,48 @@ class ControllerExtensionPaymentSnap extends Controller {
 
     Veritrans_Config::$is3ds = true;
 
-    Veritrans_Config::$isSanitized =
-        $this->config->get('snap_sanitization') == 'on'
-        ? true : false;
+    Veritrans_Config::$isSanitized = true;
 
+    $credit_card['secure'] = true;
+    $credit_card['save_card'] = true;
 
     $payloads = array();
     $payloads['transaction_details'] = $transaction_details;
     $payloads['item_details']        = $item_details;
     $payloads['customer_details']    = $customer_details;
 
+    error_log('snap oneclick value  ='.$this->config->get('snap_oneclick'));
+
+    if($this->config->get('snap_oneclick') == 1){
+      $payloads['credit_card'] = $credit_card;
+      $payloads['user_id'] = crypt( $order_info['email'], $serverKey );;
+    }  
+
+    $custom_field = array();
+    $custom_field[1] = $this->config->get('snap_custom_field1');
+    $custom_field[2] = $this->config->get('snap_custom_field2');
+    $custom_field[3] = $this->config->get('snap_custom_field3');
+
+    $expiry_unit = $this->config->get('snap_expiry_unit');
+    $expiry_duration = $this->config->get('snap_expiry_duration');
+
+    if (!empty($expiry_unit) && !empty($expiry_duration)){
+          $time = time();
+          $payloads['expiry'] = array(
+            'start_time' => date("Y-m-d H:i:s O",$time), 
+            'unit' => $expiry_unit, 
+            'duration'  => $expiry_duration
+          );
+    }
+
+    if(!empty($custom_field[1])){$payloads['custom_field1'] = $custom_field[1];}
+    if(!empty($custom_field[2])){ $payloads['custom_field2'] = $custom_field[2];}
+    if(!empty($custom_field[3])){ $payloads['custom_field3'] = $custom_field[3];}
+
     try {
-      $snapToken = Veritrans_Snap::getSnapToken($payloads);      
-      
+      error_log(print_r($payloads,TRUE));
+      $snapToken = Veritrans_Snap::getSnapToken($payloads);
+      error_log($snapToken);
       //$this->response->setOutput($redirUrl);
       $this->response->setOutput($snapToken);
     }
@@ -250,12 +279,11 @@ class ControllerExtensionPaymentSnap extends Controller {
     $redirUrl = $this->url->link('checkout/success&');
     /*$result_data = $_POST['result_data'];
     $post_response = $_POST['response'];*/    
-    ///error_log("json_decode");
     //error_log(print_r(json_decode($result_data),TRUE));
     
     $response = isset($_POST['result_data']) ? json_decode($_POST['result_data']) : json_decode($_POST['response']);
     //error_log($response->va_numbers[0]->bank);
-    //error_log(print_r($response,TRUE));
+    
     $base_url = $this->config->get('snap_environment') == 'production' 
     ? "https://app.veritrans.co.id" : "https://app.sandbox.veritrans.co.id";
     
@@ -265,7 +293,6 @@ class ControllerExtensionPaymentSnap extends Controller {
     
     if( $transaction_status == 'capture' || $transaction_status == 'settlement') {
       //if capture or pending or challenge or settlement, redirect to order received page
-
       //$this->model_checkout_order->addOrderHistory($this->session->data['order_id'],2);
       $this->model_checkout_order->addOrderHistory($response->order_id,2);
       $this->cart->clear();
@@ -280,7 +307,6 @@ class ControllerExtensionPaymentSnap extends Controller {
     }else if( $transaction_status == 'pending' && in_array($payment_type, $channel)){
 
       $check = Veritrans_Transaction::status($response->transaction_id);
-          //error_log(print_r($check,TRUE));
 
       $this->model_checkout_order->addOrderHistory($response->order_id,1);
       $this->cart->clear();
