@@ -28,7 +28,7 @@ class ControllerExtensionPaymentSnapmigs extends Controller {
     $data['button_confirm'] = $this->language->get('button_confirm');
 
   	$data['pay_type'] = 'snapmigs';
-    $data['min_txn'] = $this->config->get('snapmigs_min_txn');
+    $data['client_key'] = $this->config->get('snapmigs_client_key');
     $data['environment'] = $this->config->get('snapmigs_environment');
     $data['text_loading'] = $this->language->get('text_loading');
 
@@ -202,8 +202,8 @@ class ControllerExtensionPaymentSnapmigs extends Controller {
       $item_details[] = $coupon_item;
     }
 
-    Veritrans_Config::$serverKey = $this->config->
-        get('snapmigs_server_key');
+    $serverKey = $this->config->get('snapmigs_server_key');
+    Veritrans_Config::$serverKey = $serverKey;
 
     Veritrans_Config::$isProduction =
         $this->config->get('snapmigs_environment') == 'production'
@@ -213,9 +213,6 @@ class ControllerExtensionPaymentSnapmigs extends Controller {
 
     Veritrans_Config::$isSanitized = true;
 
-    $credit_card['save_card'] = true;
-
-    $min_txn = $this->config->get('snapmigs_min_txn');
     $credit_card['channel'] = "migs";
     $credit_card['bank'] = "bca";
 
@@ -226,6 +223,13 @@ class ControllerExtensionPaymentSnapmigs extends Controller {
     $payloads['enabled_payments']    = array('credit_card'); 
     $payloads['credit_card'] = $credit_card;
   
+    if($this->config->get('snapmigs_oneclick') == 1){
+
+      $credit_card['secure'] = true;
+      $credit_card['save_card'] = true;
+      $payloads['credit_card'] = $credit_card;
+      $payloads['user_id'] = crypt( $order_info['email'], $serverKey );;
+    }
 
     try {
       error_log(print_r($payloads,TRUE));

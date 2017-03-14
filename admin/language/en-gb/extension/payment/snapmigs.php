@@ -14,6 +14,7 @@ $_['text_edit']          = 'Configure Midtrans Snap Installment MIGS';
 // Entry
 $_['entry_environment']  = 'Environment'; // v2 API only
 $_['entry_server_key']   = 'Server Key'; // v2 API only
+$_['entry_client_key']   = 'Client Key'; // v2 API only
 $_['entry_min_txn']      = 'Minimum Transaction';
 $_['entry_payment_type'] = 'Payment Type';
 $_['entry_test']         = 'Test Mode:';

@@ -35,6 +35,7 @@ class ControllerExtensionPaymentSnapinstmigs extends Controller {
 
       'entry_environment',
       'entry_server_key',
+      'entry_client_key',
       'entry_test',
       'entry_total',
       'entry_order_status',

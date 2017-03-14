@@ -15,6 +15,7 @@ $_['text_edit']          = 'Configure Midtrans Snapbin';
 $_['entry_environment']  = 'Environment'; // v2 API only
 $_['entry_client_key']   = 'Client Key'; // v2 API only
 $_['entry_server_key']   = 'Server Key'; // v2 API only
+$_['entry_oneclick']     = 'One Click'; // v2 API only
 $_['entry_bin_number']   = 'Bin Number(s)';
 $_['entry_total']        = 'Total:<br /><span class="help">The checkout total the order must reach before this payment method becomes active.</span>';
 $_['entry_geo_zone']     = 'Geo Zone:';

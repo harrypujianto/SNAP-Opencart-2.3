@@ -94,6 +94,31 @@
 	<!-- Server Key (v2-specific) -->
 
 	<div class="form-group required v2_settings sensitive">
+	  <label class="col-sm-2 control-label" for="input-merchant-id"><?php echo $entry_client_key; ?></label>
+		<div class="col-sm-3">
+		  <input type="text" name="snapbin_client_key" value="<?php echo $snapbin_client_key; ?>" id="input-merchant-id" class="form-control" />
+		</div>
+		<div class="col-sm-3">
+		 <?php if (isset($error['client_key'])) { ?>
+		   <div class="col-sm-3"> <?php echo $error['client_key']; ?> </div>
+		 <?php } ?>
+		</div>
+	</div>
+	<!-- Server Key (v2-specific) -->
+
+	<div class="form-group">
+      <label class="col-sm-2 control-label" for="input-mode"><?php echo $entry_oneclick; ?></label>
+		<div class="col-sm-3">
+		 <select name="snapbin_oneclick" id="input-mode" class="form-control">
+		  <?php $options = array('1' => $text_enabled, '0' => $text_disabled) ?>
+		   <?php foreach ($options as $key => $value): ?>
+		    <option value="<?php echo $key ?>" <?php if ($key == $snapbin_oneclick) echo 'selected' ?> ><?php echo $value ?></option>
+		   <?php endforeach ?>
+		  </select>
+		</div>
+	 </div>
+
+	<div class="form-group required v2_settings sensitive">
 	  <label class="col-sm-2 control-label" for="input-bin_number"><?php echo $entry_bin_number; ?></label>
 		<div class="col-sm-3">
 		  <input type="text" name="snapbin_bin_number" value="<?php echo $snapbin_bin_number; ?>" id="input-merchant-id" class="form-control" />

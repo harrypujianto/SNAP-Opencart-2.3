@@ -28,6 +28,7 @@ class ControllerExtensionPaymentSnapinst extends Controller {
     $data['button_confirm'] = $this->language->get('button_confirm');
 
   	$data['pay_type'] = 'snapinst';
+    $data['client_key'] = $this->config->get('snapinst_client_key');
     $data['min_txn'] = $this->config->get('snapinst_min_txn');
     $data['environment'] = $this->config->get('snapinst_environment');
     $data['text_loading'] = $this->language->get('text_loading');

@@ -28,6 +28,7 @@ class ControllerExtensionPaymentSnapbin extends Controller {
     $data['button_confirm'] = $this->language->get('button_confirm');
 
   	$data['pay_type'] = 'snapbin';
+    $data['client_key'] = $this->config->get('snapbin_client_key');
     $data['environment'] = $this->config->get('snapbin_environment');
     $data['text_loading'] = $this->language->get('text_loading');
 
@@ -200,8 +201,8 @@ class ControllerExtensionPaymentSnapbin extends Controller {
       $item_details[] = $coupon_item;
     }
 
-    Veritrans_Config::$serverKey = $this->config->
-        get('snap_server_key');
+    $serverKey = $this->config->get('snapbin_server_key');
+    Veritrans_Config::$serverKey = $serverKey;
 
     Veritrans_Config::$isProduction =
         $this->config->get('snapbin_environment') == 'production'
@@ -214,6 +215,7 @@ class ControllerExtensionPaymentSnapbin extends Controller {
     $bin = explode(',', $this->config->get('snapbin_bin_number'));
     error_log($this->config->get('snapbin_bin_number'));
     $credit_card['whitelist_bins'] = $bin;
+    $credit_card['secure'] = true;
 
     $payloads = array();
     $payloads['transaction_details'] = $transaction_details;
@@ -221,6 +223,12 @@ class ControllerExtensionPaymentSnapbin extends Controller {
     $payloads['customer_details']    = $customer_details;
     $payloads['enabled_payments']    = array('credit_card');
     $payloads['credit_card'] = $credit_card;
+
+    if($this->config->get('snapbin_oneclick') == 1){
+      $credit_card['save_card'] = true;
+      $payloads['credit_card'] = $credit_card;
+      $payloads['user_id'] = crypt( $order_info['email'], $serverKey );
+    }
 
     try {
       $snapToken = Veritrans_Snap::getSnapToken($payloads);      

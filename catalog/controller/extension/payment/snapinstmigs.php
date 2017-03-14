@@ -28,6 +28,7 @@ class ControllerExtensionPaymentSnapinstmigs extends Controller {
     $data['button_confirm'] = $this->language->get('button_confirm');
 
   	$data['pay_type'] = 'snapinstmigs';
+    $data['client_key'] = $this->config->get('snapmigs_client_key');
     $data['min_txn'] = $this->config->get('snapinstmigs_min_txn');
     $data['environment'] = $this->config->get('snapinstmigs_environment');
     $data['text_loading'] = $this->language->get('text_loading');
