@@ -282,17 +282,56 @@ class ControllerExtensionPaymentSnap extends Controller {
     $post_response = $_POST['response'];*/    
     //error_log(print_r(json_decode($result_data),TRUE));
     
-    $response = isset($_POST['result_data']) ? json_decode($_POST['result_data']) : json_decode($_POST['response']);
-    //error_log($response->va_numbers[0]->bank);
+    if (isset($_POST['result_data'])) {
+      # code...
+      $response = isset($_POST['result_data']) ? json_decode($_POST['result_data']) : json_decode($_POST['response']);
+      error_log(print_r($response,TRUE));
+      $transaction_status = $response->transaction_status;
+      $payment_type = $response->payment_type;
+
+    } else if(isset($_GET['?id'])){
+
+      $id = isset($_GET['?id']) ? $_GET['?id'] : null;
+      $bca_status = Veritrans_Transaction::status($id);
+      $transaction_status = null;
+      error_log(print_r($bca_status,TRUE));
+      $payment_type = $bca_status->payment_type;
+    }
     
     $base_url = $this->config->get('snap_environment') == 'production' 
     ? "https://app.veritrans.co.id" : "https://app.sandbox.veritrans.co.id";
     
-    $transaction_status = $response->transaction_status;
-    $payment_type = $response->payment_type;
     $channel = array("bank_transfer", "echannel", "cstore","xl_tunai");
     
-    if( $transaction_status == 'capture' || $transaction_status == 'settlement') {
+    if($payment_type == "bca_klikpay"){
+
+      if($bca_status->transaction_status == "settlement")
+          {
+            $data['data']= array(
+            'payment_type' => "bca_klikpay",    
+            'payment_method' => "BCA KlikPay",  
+            'payment_status'  => "Success"
+            );   
+            $this->cart->clear();
+
+            $data['column_left'] = $this->load->controller('common/column_left');
+            $data['column_right'] = $this->load->controller('common/column_right');
+            $data['content_top'] = $this->load->controller('common/content_top');
+            $data['content_bottom'] = $this->load->controller('common/content_bottom');
+            $data['footer'] = $this->load->controller('common/footer');
+            $data['header'] = $this->load->controller('common/header');
+                          
+            
+            $this->response->setOutput($this->load->view('extension/payment/snap_exec',$data));
+        
+          }
+          else{
+            $redirUrl = $this->url->link('extension/payment/snap/failure','','SSL');
+            $this->response->redirect($redirUrl); 
+          }
+      
+
+    }else if( $transaction_status == 'capture' || $transaction_status == 'settlement') {
       //if capture or pending or challenge or settlement, redirect to order received page
       //$this->model_checkout_order->addOrderHistory($this->session->data['order_id'],2);
       $this->model_checkout_order->addOrderHistory($response->order_id,2);
