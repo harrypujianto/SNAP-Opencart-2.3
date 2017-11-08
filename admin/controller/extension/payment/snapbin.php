@@ -34,6 +34,7 @@ class ControllerExtensionPaymentSnapbin extends Controller {
 	    'text_edit',
 
       'entry_environment',
+      'entry_merchant_id',
       'entry_server_key',
       'entry_client_key',
       'entry_bin_number',
@@ -88,6 +89,7 @@ class ControllerExtensionPaymentSnapbin extends Controller {
 
     $inputs = array(
       'snapbin_environment',
+      'snapbin_merchant_id',
       'snapbin_server_key',
       'snapbin_client_key',
       'snapbin_oneclick',

@@ -24,25 +24,29 @@ class ControllerExtensionPaymentSnapbin extends Controller {
 
   public function index() {
 
+    if ($this->request->server['HTTPS']) {
+      $data['base'] = $this->config->get('config_ssl');
+    } else {
+      $data['base'] = $this->config->get('config_url');
+    }
+
+
     $data['errors'] = array();
     $data['button_confirm'] = $this->language->get('button_confirm');
 
+    $env = $this->config->get('snapbin_environment') == 'production' ? true : false;
+    $data['mixpanel_key'] = $env == true ? "17253088ed3a39b1e2bd2cbcfeca939a" : "9dcba9b440c831d517e8ff1beff40bd9";
+
   	$data['pay_type'] = 'snapbin';
+    $data['merchant_id'] = $this->config->get('snapbin_merchant_id');
     $data['client_key'] = $this->config->get('snapbin_client_key');
     $data['environment'] = $this->config->get('snapbin_environment');
     $data['text_loading'] = $this->language->get('text_loading');
 
   	$data['process_order'] = $this->url->link('extension/payment/snapbin/process_order');
 
-     if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/snapbin.tpl')) {
-        return $this->load->view($this->config->get('config_template') . '/template/payment/snapbin.tpl',$data);
-    } else {
-     if (VERSION > 2.1 ) {
-        return $this->load->view('extension/payment/snapbin', $data);
-      } else {
-        return $this->load->view('default/template/payment/snapbin.tpl', $data);
-      }
-    }
+    return $this->load->view('extension/payment/snapbin', $data);
+
 
   }
 

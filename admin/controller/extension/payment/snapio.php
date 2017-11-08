@@ -34,6 +34,7 @@ class ControllerExtensionPaymentSnapio extends Controller {
 	    'text_edit',
 
       'entry_environment',
+      'entry_merchant_id',
       'entry_server_key',
       'entry_client_key',
       'entry_test',
@@ -84,6 +85,7 @@ class ControllerExtensionPaymentSnapio extends Controller {
 
     $inputs = array(
       'snapio_environment',
+      'snapio_merchant_id',
       'snapio_server_key',
       'snapio_client_key',
       'snapio_geo_zone_id',

@@ -24,25 +24,29 @@ class ControllerExtensionPaymentSnap extends Controller {
 
   public function index() {
 
+    if ($this->request->server['HTTPS']) {
+      $data['base'] = $this->config->get('config_ssl');
+    } else {
+      $data['base'] = $this->config->get('config_url');
+    }
+
     $data['errors'] = array();
     $data['button_confirm'] = $this->language->get('button_confirm');
 
+    $env = $this->config->get('snap_environment') == 'production' ? true : false;
+    $data['mixpanel_key'] = $env == true ? "17253088ed3a39b1e2bd2cbcfeca939a" : "9dcba9b440c831d517e8ff1beff40bd9";
+    $data['merchant_id'] = $this->config->get('snap_merchant_id');
+    
     $data['pay_type'] = 'snap';
     $data['client_key'] = $this->config->get('snap_client_key');
     $data['environment'] = $this->config->get('snap_environment');
     $data['text_loading'] = $this->language->get('text_loading');
 
-    $data['process_order'] = $this->url->link('extension/payment/snap/process_order');
-
-     if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/snap.tpl')) {
-        return $this->load->view($this->config->get('config_template') . '/template/payment/snap.tpl',$data);
-    } else {
-     if (VERSION > 2.1 ) {
-        return $this->load->view('extension/payment/snap', $data);
-      } else {
-        return $this->load->view('default/template/payment/snap.tpl', $data);
-      }
-    }
+    $data['process_order'] = $this->url->link('extension/payment/snap/process_order'); 
+     
+    return $this->load->view('extension/payment/snap', $data);
+      
+    
 
   }
 
@@ -207,10 +211,6 @@ class ControllerExtensionPaymentSnap extends Controller {
     Veritrans_Config::$isProduction =
         $this->config->get('snap_environment') == 'production'
         ? true : false;
-
-    Veritrans_Config::$is3ds = true;
-
-    Veritrans_Config::$isSanitized = true;
 
     $credit_card['secure'] = true;
     $credit_card['save_card'] = true;
@@ -585,5 +585,15 @@ class ControllerExtensionPaymentSnap extends Controller {
           }
     }
     //error_log($logs); //debugan to be commented
+  }
+
+  public function payment_cancel() {
+    
+    $this->load->model('checkout/order');
+    error_log($this->session->data['order_id']);
+    $current_order_id = $this->session->data['order_id'];
+    $this->model_checkout_order->addOrderHistory($current_order_id,7,'Cancel from snap close.');
+    error_log('cancel order'. $this->session->data['order_id']. 'success');
+    echo 'ok';
   }
 }

@@ -35,6 +35,7 @@ class ControllerExtensionPaymentSnap extends Controller {
 
       'entry_environment',
       'entry_server_key',
+      'entry_merchant_id',
       'entry_oneclick',
       'entry_order_status',
       'entry_geo_zone',
@@ -86,7 +87,9 @@ class ControllerExtensionPaymentSnap extends Controller {
 
     $inputs = array(
       'snap_environment',
+      'snap_client_key',
       'snap_server_key',
+      'snap_merchant_id',
       'snap_oneclick',
       'snap_order_status_id',
       'snap_geo_zone_id',
@@ -96,7 +99,6 @@ class ControllerExtensionPaymentSnap extends Controller {
       'snap_installment_terms',
       'snap_currency_conversion',
       'snap_status',
-      'snap_client_key',
       'snap_expiry_duration',
       'snap_expiry_unit',
       'snap_custom_field1',

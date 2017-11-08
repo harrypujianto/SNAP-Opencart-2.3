@@ -13,6 +13,7 @@ $_['text_edit']          = 'Configure Midtrans Snap Installment MIGS';
  
 // Entry
 $_['entry_environment']  = 'Environment'; // v2 API only
+$_['entry_merchant_id']  = 'Merchant Id'; // v2 API only
 $_['entry_client_key']   = 'Client Key'; // v2 API only
 $_['entry_server_key']   = 'Server Key'; // v2 API only
 $_['entry_min_txn']      = 'Minimum Transaction';

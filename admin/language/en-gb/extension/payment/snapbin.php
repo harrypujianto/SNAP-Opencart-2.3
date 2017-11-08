@@ -12,7 +12,8 @@ $_['text_fail']          = 'Always Fail';
 $_['text_edit']          = 'Configure Midtrans Snapbin';
 
 // Entry
-$_['entry_environment']  = 'Environment'; // v2 API only
+$_['entry_environment']  = 'Environment';
+$_['entry_merchant_id']  = 'Merchant Id'; // v2 API only
 $_['entry_client_key']   = 'Client Key'; // v2 API only
 $_['entry_server_key']   = 'Server Key'; // v2 API only
 $_['entry_oneclick']     = 'One Click'; // v2 API only

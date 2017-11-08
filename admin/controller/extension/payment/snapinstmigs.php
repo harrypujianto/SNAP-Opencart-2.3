@@ -34,6 +34,7 @@ class ControllerExtensionPaymentSnapinstmigs extends Controller {
 	    'text_edit',
 
       'entry_environment',
+      'entry_merchant_id',
       'entry_server_key',
       'entry_client_key',
       'entry_test',
@@ -84,7 +85,9 @@ class ControllerExtensionPaymentSnapinstmigs extends Controller {
 
     $inputs = array(
       'snapinstmigs_environment',
+      'snapinstmigs_merchant_id',
       'snapinstmigs_server_key',
+      'snapinstmigs_client_key',
       'snapinstmigs_geo_zone_id',
       'snapinstmigs_sort_order',
       'snapinstmigs_min_txn',

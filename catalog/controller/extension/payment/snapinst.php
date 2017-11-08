@@ -24,9 +24,19 @@ class ControllerExtensionPaymentSnapinst extends Controller {
 
   public function index() {
 
+    if ($this->request->server['HTTPS']) {
+      $data['base'] = $this->config->get('config_ssl');
+    } else {
+      $data['base'] = $this->config->get('config_url');
+    }
+
     $data['errors'] = array();
     $data['button_confirm'] = $this->language->get('button_confirm');
 
+    $env = $this->config->get('snap_environment') == 'production' ? true : false;
+    $data['mixpanel_key'] = $env == true ? "17253088ed3a39b1e2bd2cbcfeca939a" : "9dcba9b440c831d517e8ff1beff40bd9";
+    $data['merchant_id'] = $this->config->get('snapinst_merchant_id');
+    
   	$data['pay_type'] = 'snapinst';
     $data['client_key'] = $this->config->get('snapinst_client_key');
     $data['min_txn'] = $this->config->get('snapinst_min_txn');
@@ -240,6 +250,8 @@ class ControllerExtensionPaymentSnapinst extends Controller {
   
 
     try {
+      error_log(print_r($payloads,TRUE));
+      error_log(json_encode($payloads));
       $snapToken = Veritrans_Snap::getSnapToken($payloads);      
       
       //$this->response->setOutput($redirUrl);
