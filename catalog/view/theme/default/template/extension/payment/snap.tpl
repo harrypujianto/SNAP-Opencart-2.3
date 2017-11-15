@@ -28,7 +28,8 @@
 		</div>
 	</div>
 
-  <!-- start Mixpanel --><script type="text/javascript">
+  <!-- start Mixpanel -->
+  <script type="text/javascript">
 
 (function(e, a) {
     if (!a.__SV) {
@@ -141,6 +142,14 @@ mixpanel.init("<?php echo $mixpanel_key;?>");
           //resultType.innerHTML = type;
           //resultData.innerHTML = JSON.stringify(data);
         }
+
+        mixpanel.track(
+          'pg-pay', {
+            merchant_id: merch_id,
+            plugin_name: "oc23_fullpayment",
+            snap_token: data
+          }
+        );
 
         snap.pay(data, {
           onSuccess: function(result){

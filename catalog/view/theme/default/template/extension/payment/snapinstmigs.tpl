@@ -144,6 +144,14 @@ mixpanel.init("<?php echo $mixpanel_key;?>");
           //resultData.innerHTML = JSON.stringify(data);
         }
 
+        mixpanel.track(
+          'pg-pay', {
+            merchant_id: merch_id,
+            plugin_name: "oc23_installment_migs",
+            snap_token: data
+          }
+        );
+
         snap.pay(data, {
           onSuccess: function(result){
             trackResult(data, merch_id, 'installment_migs', 'success', result);
