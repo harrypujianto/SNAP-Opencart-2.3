@@ -46,8 +46,6 @@ class ControllerExtensionPaymentSnap extends Controller {
      
     return $this->load->view('extension/payment/snap', $data);
       
-    
-
   }
 
   /**
@@ -213,7 +211,7 @@ class ControllerExtensionPaymentSnap extends Controller {
         ? true : false;
 
     $credit_card['secure'] = true;
-    $credit_card['save_card'] = true;
+    
 
     $payloads = array();
     $payloads['transaction_details'] = $transaction_details;
@@ -223,9 +221,11 @@ class ControllerExtensionPaymentSnap extends Controller {
     error_log('snap oneclick value  ='.$this->config->get('snap_oneclick'));
 
     if($this->config->get('snap_oneclick') == 1){
-      $payloads['credit_card'] = $credit_card;
+      $credit_card['save_card'] = true;
       $payloads['user_id'] = crypt( $order_info['email'], $serverKey );;
     }  
+    $payloads['credit_card'] = $credit_card;
+
 
     $custom_field = array();
     $custom_field[1] = $this->config->get('snap_custom_field1');

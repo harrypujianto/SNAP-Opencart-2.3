@@ -230,9 +230,9 @@ class ControllerExtensionPaymentSnapbin extends Controller {
 
     if($this->config->get('snapbin_oneclick') == 1){
       $credit_card['save_card'] = true;
-      $payloads['credit_card'] = $credit_card;
       $payloads['user_id'] = crypt( $order_info['email'], $serverKey );
     }
+    $payloads['credit_card'] = $credit_card;
 
     try {
       $snapToken = Veritrans_Snap::getSnapToken($payloads);      

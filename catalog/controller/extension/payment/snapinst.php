@@ -236,17 +236,16 @@ class ControllerExtensionPaymentSnapinst extends Controller {
     $installment['required'] = TRUE;
     $installment['terms'] = $installment_term;    
 
-    $credit_card['installment'] = $installment;
+    if ($transaction_details['gross_amount'] >= $this->config->get('snapinst_min_txn')){
+      $credit_card['installment'] = $installment;
+    }
 
     $payloads = array();
     $payloads['transaction_details'] = $transaction_details;
     $payloads['item_details']        = $item_details;
     $payloads['customer_details']    = $customer_details;
-    $payloads['enabled_payments']    = array('credit_card');
-    
-    if ($transaction_details['gross_amount'] >= $this->config->get('snapinst_min_txn')){
-      $payloads['credit_card'] = $credit_card;
-    }
+    $payloads['enabled_payments']    = array('credit_card');    
+    $payloads['credit_card'] = $credit_card;
   
 
     try {
